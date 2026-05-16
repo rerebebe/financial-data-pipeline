@@ -1,0 +1,19 @@
+# --- Database & Warehouse ---
+google-cloud-bigquery==3.40.0
+pandas-gbq==0.33.0
+
+# --- Transformation Layer ---
+dbt-core==1.11.7
+dbt-bigquery==1.11.1
+
+# --- Data Science & Analysis ---
+pandas==2.3.3
+yfinance==1.2.0
+
+# --- Formatting & Compatibility ---
+shandy-sqlfmt[jinjafmt]==0.29.0
+pathspec==0.12.1
+sqlfluff==2.3.5
+
+# --- Utilities ---
+python-dotenv==1.2.1

@@ -1,0 +1,12 @@
+# service acount key to access gcp resources
+gcp-key.json
+
+.env
+
+# Airflow generated logs
+orchestration/logs/
+infra/logs/
+
+# Python
+__pycache__/
+*.pyc

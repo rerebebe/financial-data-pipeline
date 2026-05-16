@@ -1,0 +1,52 @@
+version: 2
+
+sources:
+  - name: stock_quotes_bigquery
+    database: stock-market-project-487008
+    schema: stock_market_data
+    tables:
+      - name: raw_5_year_stock_price # From yfinance
+        description: '5 years of historical OHLCV data from yfinance'
+        columns:
+          - name: symbol
+            description: 'Stock ticker symbol (e.g., AAPL, MSFT)'
+            tests:
+              - not_null
+          - name: date
+            description: 'Date of the stock price data (YYYY-MM-DD)'
+            tests:
+              - not_null
+          - name: close
+            tests:
+              - not_null
+              - dbt_utils.expression_is_true:
+                  expression: '>= 0'
+          - name: high
+            tests:
+              - not_null
+              - dbt_utils.expression_is_true:
+                  expression: '>= 0'
+          - name: low
+            tests:
+              - not_null
+              - dbt_utils.expression_is_true:
+                  expression: '>= 0'
+          - name: open
+            tests:
+              - not_null
+              - dbt_utils.expression_is_true:
+                  expression: '>= 0'
+          - name: volume
+            tests:
+              - not_null
+              - dbt_utils.expression_is_true:
+                  expression: '>= 0'
+          - name: ingest_time
+            description: 'Timestamp when the data was ingested into BigQuery'
+
+      - name: raw_quotes # From Finnhub Pub/Sub
+        description: 'Real-time price updates from Finnhub quote endpoint'
+        columns:
+          - name: data
+            tests:
+              - not_null

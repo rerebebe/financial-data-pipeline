@@ -1,0 +1,62 @@
+{
+  "workbench.colorTheme": "Visual Studio Dark",
+  "window.zoomLevel": -1,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // 2. Force VS Code to treat .sql files as dbt files
+  "files.associations": {
+    "*.sql": "jinja-sql"
+  },
+
+  // Top-level settings (No brackets)
+  "dbt.sqlFmtPath": "/opt/anaconda3/envs/financial-pipeline/bin/sqlfmt",
+
+  // --- SQL / dbt Fix ---
+  "[jinja-sql]": {
+    "editor.defaultFormatter": "innoverio.vscode-dbt-power-user",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.sqlfluff": "always"
+    }
+  },
+
+  "sqlfluff.executablePath": "/opt/anaconda3/envs/financial-pipeline/bin/sqlfluff",
+  "sqlfluff.linter.run": "onSave",
+  "sqlfluff.dialect": "bigquery",
+  "sqlfluff.templater": "dbt",
+
+  // "[sql]": {
+  //   "editor.defaultFormatter": "innoverio.vscode-dbt-power-user",
+  //   "editor.formatOnSave": true
+  // },
+
+  // --- YAML Fix ---
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+
+  // --- Prettier Fixes ---
+  "prettier.requireConfig": false,
+  "prettier.tabWidth": 2,
+  "prettier.singleQuote": true,
+
+  // --- Terminal & Environment ---
+  "terminal.integrated.inheritEnv": false,
+  "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
+  "terminal.integrated.profiles.osx": {
+    "zsh": {
+      "path": "/bin/zsh"
+    }
+  },
+
+  "git.openRepositoryInParentFolders": "always",
+  "window.commandCenter": false,
+  "workbench.settings.applyToAllProfiles": ["editor.formatOnSave"],
+  "editor.formatOnPaste": true,
+  "python-envs.defaultEnvManager": "ms-python.python:conda",
+  "python-envs.defaultPackageManager": "ms-python.python:conda",
+  "sqlfluff.excludeRules": ["LT02"]
+}

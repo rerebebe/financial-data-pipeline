@@ -1,0 +1,82 @@
+version: 2
+
+models:
+  - name: int_unified_stock_history
+    description: This is prepare some column for jinja macro and other transformation in the future.
+    columns:
+      - name: quote_date
+        description: The date of the stock price quote.
+        tests:
+          - not_null
+
+      - name: close_price_validated
+        description: Validated closing price
+        tests:
+          - not_null
+
+      - name: day_high_validated
+        description: Validated daily high price
+        tests:
+          - not_null
+
+      - name: day_low_validated
+        description: Validated daily low price
+        tests:
+          - not_null
+
+      - name: open_price_validated
+        description: Validated opening price
+        tests:
+          - not_null
+
+      - name: previous_close_price
+        description: The closing price of the previous trading day for the same stock symbol.
+        tests:
+          - not_null:
+              config:
+                where: 'daily_price_change IS NOT NULL'
+
+      - name: daily_price_change
+        description: close_price_validated - previous_close_price
+        tests:
+          - not_null:
+              config:
+                where: 'daily_price_change IS NOT NULL'
+
+      - name: daily_price_change_percentage
+        description: (close_price_validated - previous_close_price) / previous_close_price, expressed as a percentage. This indicates the percentage change in the stock price from the previous day to the current day.
+        tests:
+          - not_null:
+              config:
+                where: 'daily_price_change IS NOT NULL'
+
+      - name: gain
+        description: close_price_validated - previous_close_price when close price is greater than previous close price
+        tests:
+          - not_null:
+              config:
+                where: 'daily_price_change IS NOT NULL'
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+      - name: loss
+        description: previous_close_price - close_price_validated when close price is less than previous close price, but expressed as a positive value using ABS() function.
+        tests:
+          - not_null:
+              config:
+                where: 'daily_price_change IS NOT NULL'
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+  - name: int_finnhub_intraday_cleaned
+    description: This model performs data cleaning and validation on the intraday stock price data ingested from Finnhub.
+    columns:
+      - name: data_quality_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['VALID']
+              config:
+                severity: warn
+                warn_if: '> 5'
+                error_if: '> 50'

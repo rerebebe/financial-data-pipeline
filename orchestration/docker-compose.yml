@@ -1,0 +1,128 @@
+version: '3.8'
+
+x-airflow-common: &airflow-common
+  image: apache/airflow:2.9.3
+  env_file: ../.env
+  user: '${AIRFLOW_UID:-50000}:0'
+  environment:
+    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    - _PIP_ADDITIONAL_REQUIREMENTS=dbt-bigquery pandas google-cloud-bigquery pandas_market_calendars
+    - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-key.json
+  volumes:
+    - ..:/app # mounts entire project root
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+  depends_on:
+    - postgres
+
+services:
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:7.4.1
+  #   container_name: zookeeper
+  #   environment:
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+  #     ZOOKEEPER_TICK_TIME: 2000
+  #   ports:
+  #     - "2181:2181"
+
+  # kafka:
+  #   image: confluentinc/cp-kafka:7.4.1
+  #   container_name: kafka
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"   # internal Docker network
+  #     - "29092:29092" # external host machine
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #     KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://host.docker.internal:29092
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+  # kafdrop:
+  #   image: obsidiandynamics/kafdrop:latest
+  #   container_name: kafdrop
+  #   depends_on:
+  #     - kafka
+  #   ports:
+  #     - "9000:9000"
+  #   environment:
+  #     KAFKA_BROKERCONNECT: "kafka:9092"
+
+  # minio:
+  #   image: minio/minio:latest
+  #   container_name: minio
+  #   ports:
+  #     - "9001:9001"  # Console UI
+  #     - "9002:9000"  # S3 API
+  #   environment:
+  #     MINIO_ROOT_USER: admin
+  #     MINIO_ROOT_PASSWORD: password123
+  #   command: server /data --console-address ":9001"
+
+  stock-producer:
+    build:
+      context: .. # build from repo root
+      dockerfile: orchestration/Dockerfile
+    container_name: stock-producer
+    restart: always
+    env_file: ../.env
+    volumes:
+      # - .:/app # Syncs your code so you can make changes without rebuilding (Bind-Mounting)
+      - ../gcp-key.json:/app/gcp-key.json # Mounts your GCP key for BigQuery access
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow-init
+    restart: on-failure
+    entrypoint: []
+    command:
+      - bash
+      - -c
+      - 'airflow db migrate && airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin'
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow-webserver
+    restart: always
+    depends_on:
+      - airflow-init
+      - airflow-scheduler
+      - postgres
+    ports:
+      - '8080:8080'
+    command: webserver
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow-scheduler
+    restart: always
+    depends_on:
+      - airflow-init
+      - postgres
+    command: scheduler
+
+  # For Airflow, we need a separate service for the scheduler and the webserver, both connecting to the same Postgres database. The scheduler will run in the background and execute tasks, while the webserver will provide the UI for monitoring and managing workflows.
+  postgres:
+    image: postgres:15
+    container_name: airflow-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  postgres_data:

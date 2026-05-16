@@ -1,0 +1,64 @@
+# Name your project! Project names should contain only lowercase characters
+# and underscores. A good package name should reflect your organization's
+# name or the intended use of these models
+name: 'dbt_stocks'
+version: '1.0.0'
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'dbt_stocks'
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ['models']
+analysis-paths: ['analyses']
+test-paths: ['tests']
+seed-paths: ['seeds']
+macro-paths: ['macros']
+snapshot-paths: ['snapshots']
+
+clean-targets: # directories to be removed by `dbt clean`
+  - 'target'
+  - 'dbt_packages'
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+# In this example config, we tell dbt to build all models in the example/
+# directory as views. These settings can be overridden in the individual model
+# files using the `{{ config(...) }}` macro.
+models:
+  # accordin to my project strucutre what do you suggest the table down there look like ?
+
+  dbt_stocks:
+    archive:
+      +enabled: false
+
+    staging:
+      +schema: staging
+      +materialized: table
+
+    intermediate:
+      +schema: intermediate
+
+      # everytime we union we dont rerun query
+      int_daily_summary_from_intraday:
+        +materialized: table
+
+      int_unified_stock_history:
+        +materialized: table
+
+    marts:
+      +schema: marts
+
+      fct_stock_history_performance:
+        +materialized: table
+
+      fct_stock_intraday:
+        +materialized: view
+
+      fct_latest_indicators:
+        +materialized: table
+
+      fct_stock_snapshot:
+        +materialized: view

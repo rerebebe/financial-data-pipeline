@@ -1,0 +1,111 @@
+version: 2
+
+models:
+  - name: fct_stock_history_performance
+    description: 'Incremental table storing daily technical indicators'
+    columns:
+      - name: unique_id
+        description: 'Surrogate key (symbol + quote_date)'
+        tests:
+          - unique
+          - not_null
+      - name: symbol
+        description: 'Stock ticker symbol'
+        tests:
+          - not_null
+      - name: quote_date
+        description: 'The trading date'
+        tests:
+          - not_null
+
+      - name: rsi_14
+        description: 'Relative Strength Index (14-day). Range: 0-100.'
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              config:
+                where: 'row_num >= 15' # less than 14 days of data where RSI might be null
+
+      - name: true_range
+        description: 'True range for volatility calculation.'
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              config:
+                where: 'true_range is not null'
+
+      - name: log_return
+        description: 'Log return from previous day.'
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: -1.0
+              max_value: 1.0
+              severity: warn
+
+  - name: fct_stock_intraday
+    description: 'Real-time view for dashboards. Joins live minute-by-minute quotes with the latest historical technical indicators.'
+    columns:
+      - name: symbol
+        tests:
+          - not_null
+      - name: quote_timestamp
+        tests:
+          - not_null
+
+  - name: fct_latest_indicators
+    description: 'Latest indicators per symbol for intraday join. 1 row per symbol.'
+    columns:
+      - name: symbol
+        tests:
+          - unique
+          - not_null
+
+      - name: rsi_14
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+
+
+models:
+  - name: fct_stock_snapshot
+    description: "Latest price snapshot per symbol for Overview cards"
+
+    columns:
+      - name: symbol
+        tests:
+          - not_null
+
+      - name: quote_timestamp
+        tests:
+          - not_null
+
+      - name: daily_price_change_percentage
+        tests:
+          - not_null
+
+      - name: current_price
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '>= 0'
+
+      - name: open_price
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '> 0'
+
+      - name: day_high
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '> 0'
+
+      - name: day_low
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '> 0'

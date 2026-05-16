@@ -1,0 +1,128 @@
+version: 2
+
+models:
+  - name: stg_5_year_stock_price
+    description: 'Staging model for 5 years of historical OHLCV data from yfinance'
+    columns:
+      - name: symbol
+        description: 'Stock ticker symbol (e.g., AAPL, MSFT)'
+        tests:
+          - not_null
+      - name: quote_date
+        description: 'Date of the stock price data (YYYY-MM-DD)'
+        tests:
+          - not_null
+
+      - name: open_price
+        description: 'Opening price of the stock for the day'
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '> 0'
+
+      - name: day_high
+        description: 'Highest price of the stock for the day'
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '>= day_low'
+
+      - name: day_low
+        description: 'Lowest price of the stock for the day'
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ' <= day_high'
+
+      - name: close_price
+        description: 'Closing price of the stock for the day'
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '> 0'
+
+      - name: volume
+        description: 'Trading volume of the stock for the day'
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '> 0'
+
+      - name: ingest_timestamp
+        description: 'Timestamp when the data was ingested into the staging layer'
+
+      - name: data_source
+        description: "Source of the stock price data (e.g., 'yfinance')"
+
+  - name: stg_stock_quotes
+    description: 'Staging model for real-time price updates from Finnhub quote endpoint'
+    columns:
+      - name: symbol
+        description: 'Stock ticker symbol (e.g., AAPL, MSFT)'
+        tests:
+          - not_null
+
+      - name: quote_date
+        description: 'Date of the stock price data (YYYY-MM-DD)'
+        tests:
+          - not_null
+
+      - name: quote_timestamp
+        description: 'Timestamp of the stock quote'
+        tests:
+          - not_null
+
+      - name: open_price
+        description: 'Opening price of the stock for the day'
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '> 0'
+
+      - name: day_high
+        description: 'Highest price of the stock for the day'
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '> 0'
+
+      - name: day_low
+        description: 'Lowest price of the stock for the day'
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '> 0'
+
+      - name: current_price
+        description: 'Current price of the stock'
+        tests:
+          - not_null:
+              config:
+                severity: warn
+          - dbt_utils.expression_is_true:
+              expression: '> 0'
+
+      - name: daily_price_change
+        description: 'Absolute change in price from the previous close'
+        tests:
+          - not_null
+
+      - name: daily_price_change_percentage
+        description: 'Percentage change in price from the previous close'
+        tests:
+          - not_null
+
+      - name: previous_close_price
+        description: 'Closing price of the stock from the previous trading day'
+        tests:
+          - not_null
+
+      - name: ingest_timestamp
+        description: 'Timestamp when the data was ingested into the staging layer'
+        tests:
+          - not_null
+
+      - name: data_source
+        description: "Source of the stock price data (e.g., 'finnhub')"
+        tests:
+          - not_null

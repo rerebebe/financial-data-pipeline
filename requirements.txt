@@ -13,7 +13,8 @@ yfinance==1.2.0
 # --- Formatting & Compatibility ---
 shandy-sqlfmt[jinjafmt]==0.29.0
 pathspec==0.12.1
-sqlfluff==2.3.5
+sqlfluff==3.1.0
+sqlfluff-templater-dbt==3.1.0
 
 # --- Utilities ---
 python-dotenv==1.2.1

@@ -10,3 +10,7 @@ infra/logs/
 # Python
 __pycache__/
 *.pyc
+
+
+.DS_Store
+producer_test.py

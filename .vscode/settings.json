@@ -21,7 +21,9 @@
       "source.fixAll.sqlfluff": "always"
     }
   },
-
+  "files.associations": {
+    ".sqlfluff": "ini"
+  },
   "sqlfluff.executablePath": "/opt/anaconda3/envs/financial-pipeline/bin/sqlfluff",
   "sqlfluff.linter.run": "onSave",
   "sqlfluff.dialect": "bigquery",

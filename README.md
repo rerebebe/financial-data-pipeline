@@ -24,6 +24,8 @@ This pipeline processes real-time and historical stock market data through a mod
 
 ![Architecture](assets/data_stack.png)
 
+---
+
 ## ⚡ Tech Stack
 
 | Layer          | Technology                    | Purpose                               |
@@ -288,16 +290,32 @@ dbt build --project-dir dbt_stocks --profiles-dir dbt_stocks
 
 ---
 
-## 📊 Final Deliverables
+## 📸 Dashboard Preview
 
-- Automated real-time + historical data pipeline on GCP
-- BigQuery tables across staging → intermediate → marts
-- 10+ dbt models with financial indicators computed in SQL
-- Orchestrated DAGs in Airflow (EOD + intraday)
-- Power BI dashboard with live intraday and 5-year historical views
+> Built in Power BI connected live to BigQuery. Each stock has a dedicated drill-through page — screenshots shown using AAPL.
+
+### Real-Time Overview
+
+![Intraday Overview](assets/powerbi_overview.png)
+
+### Real-Time Intraday View
+
+![Intraday Dashboard](assets/powerbi_intraday.png)
+
+### Historical View
+
+![Historical Dashboard](assets/powerbi_historical.png)
 
 ---
 
-_Author: [Your Name](https://www.linkedin.com/in/yourprofile/)_  
-_Contact: your@email.com_  
-_⭐ If this project helped you, please give it a star!_
+## 📊 Final Deliverables
+
+- Automated real-time + historical pipeline ingesting live market data 24/5
+- 10+ dbt models with financial indicators computed entirely in SQL
+- Orchestrated DAGs with data quality gates at every layer
+- Power BI dashboard with drill-through pages per symbol
+
+---
+
+_Author: [Regina Liu] (https://www.linkedin.com/in/regina-liu-0a16229b/)_  
+_Contact: reginabb68@gmail.com_

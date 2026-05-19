@@ -22,7 +22,7 @@ This pipeline processes real-time and historical stock market data through a mod
 
 ## 🏗️ Architecture
 
-![Architecture](docs/data_stack.png)
+![Architecture](assets/data_stack.png)
 
 ## ⚡ Tech Stack
 

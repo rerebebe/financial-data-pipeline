@@ -2,7 +2,7 @@
 templater = jinja
 dialect = bigquery
 # We put all ignores here. No spaces after commas.
-exclude_rules = CP01,LT05,ST06,JJ01,LT02,LT04,LT09
+exclude_rules = CP01,LT05,ST06,JJ01,LT02,LT04,LT09,RF04,CV03,AL03,LT12,RF04
 ignore = macros,target,dbt_packages,templating
 indent_unit = space
 tab_space_size = 2

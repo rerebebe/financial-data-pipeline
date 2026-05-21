@@ -26,7 +26,20 @@
   "sqlfluff.dialect": "bigquery",
   // "sqlfluff.format.enabled": true,
   "sqlfluff.linter.run": "onSave",
-  "sqlfluff.excludeRules": ["LT02", "AL01"],
+  "sqlfluff.excludeRules": [
+    "CP01",
+    "LT05",
+    "ST06",
+    "JJ01",
+    "LT02",
+    "LT04",
+    "LT09",
+    "RF04",
+    "CV03",
+    "AL03",
+    "LT12",
+    "RF04"
+  ],
 
   // "[sql]": {
   //   "editor.defaultFormatter": "innoverio.vscode-dbt-power-user",

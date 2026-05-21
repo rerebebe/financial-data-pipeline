@@ -11,9 +11,9 @@ A production-ready data engineering project demonstrating real-time streaming an
 This pipeline processes real-time and historical stock market data through a modern data architecture:
 
 - **Real-time streaming:** Live stock quotes via Finnhub → GCP Pub/Sub → BigQuery
-- **Historical batch load:** 5-year OHLCV data via yfinance → BigQuery (one-time backfill)
+- **Historical batch load:** 5-year OHLC data via yfinance → BigQuery (one-time backfill)
 - **Data transformation:** dbt layered architecture (Staging → Intermediate → Marts)
-- **Technical indicators:** SMA, EMA, RSI, Bollinger Bands, ATR — all computed in SQL
+- **Technical indicators:** SMA, EMA, RSI, Bollinger Bands, ATR — all computed entirely in **dbt Jinja macros**
 - **Analytics:** Power BI dashboards with real-time intraday and 5-year historical views
 
 **Tracked symbols:** AAPL · TSLA · MSFT · GOOGL · AMZN · NVDA
@@ -37,7 +37,6 @@ This pipeline processes real-time and historical stock market data through a mod
 | Orchestration  | Apache Airflow                | Workflow automation                   |
 | Infrastructure | Docker + Docker Compose       | Containerised deployment              |
 | Visualisation  | Power BI                      | Dashboards & analytics                |
-| Code Quality   | SQLFluff                      | SQL linting (BigQuery dialect)        |
 
 ---
 
@@ -213,7 +212,7 @@ financial-data-pipeline/
 ├── backfill_stocks_prices.py      # One-time historical load
 ├── requirements.txt
 ├── .env.example
-├── .sqlfluff                      # SQL linting config
+├── .sqlfluff                      # SQL linting (SQLFluff) + format-on-save (sqlfmt)
 ├── dbt_stocks/
 │   ├── models/
 │   │   ├── staging/
@@ -242,38 +241,6 @@ dbt tests run automatically on every `dbt build`:
 - `accepted_range` on RSI (0–100) and all price columns (`> 0`)
 - Tick-level quality classification in staging — downstream models consume `VALID` ticks only
 
-SQL style enforced with **SQLFluff** (`dialect = bigquery`, `templater = dbt`).
-
----
-
-## 🛠️ Troubleshooting
-
-**Airflow services won't start**
-
-```bash
-docker-compose down -v
-docker-compose up -d
-```
-
-**Producer not publishing to Pub/Sub**
-
-```bash
-# Check GCP credentials are mounted correctly
-docker logs producer-container
-# Verify gcp-key.json is at the project root
-```
-
-**dbt tests failing**
-
-```bash
-dbt debug --project-dir dbt_stocks
-dbt build --project-dir dbt_stocks --profiles-dir dbt_stocks
-```
-
-**BigQuery permission errors**
-
-- Ensure your service account has `BigQuery Data Editor` and `BigQuery Job User` roles
-
 ---
 
 ## 🗺️ Roadmap
@@ -294,15 +261,15 @@ dbt build --project-dir dbt_stocks --profiles-dir dbt_stocks
 
 > Built in Power BI connected live to BigQuery. Each stock has a dedicated drill-through page — screenshots shown using AAPL.
 
-### Real-Time Overview
+### Overview - Real-Time
 
 ![Intraday Overview](assets/powerbi_overview.png)
 
-### Real-Time Intraday View
+### Intraday Chart — Today's Price Movement
 
 ![Intraday Dashboard](assets/powerbi_intraday.png)
 
-### Historical View
+### Historical Chart
 
 ![Historical Dashboard](assets/powerbi_historical.png)
 
@@ -311,9 +278,9 @@ dbt build --project-dir dbt_stocks --profiles-dir dbt_stocks
 ## 📊 Final Deliverables
 
 - Automated real-time + historical pipeline ingesting live market data 24/5
-- 10+ dbt models with financial indicators computed entirely in SQL
-- Orchestrated DAGs with data quality gates at every layer
-- Power BI dashboard with drill-through pages per symbol
+- 10+ dbt models with **6 technical indicators** (SMA, EMA, RSI, Bollinger Bands, ATR, Annualised Volatility) computed entirely in SQL — no Python, no external libraries
+- Orchestrated DAGs with NYSE holiday awareness and data quality gates at every layer
+- Power BI dashboard with drill-through pages per symbol, time period filters (5D/1M/3M/1Y/5Y), and toggleable indicator overlays — dashboard demonstrates SMA crossovers; full indicator set available in the data model
 
 ---
 

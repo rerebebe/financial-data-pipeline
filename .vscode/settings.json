@@ -4,14 +4,7 @@
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-
-  // 2. Force VS Code to treat .sql files as dbt files
-  "files.associations": {
-    "*.sql": "jinja-sql"
-  },
-
-  // Top-level settings (No brackets)
-  "dbt.sqlFmtPath": "/opt/anaconda3/envs/financial-pipeline/bin/sqlfmt",
+  "editor.formatOnPaste": true,
 
   // --- SQL / dbt Fix ---
   "[jinja-sql]": {
@@ -22,12 +15,18 @@
     }
   },
   "files.associations": {
+    // 2. Force VS Code to treat .sql files as dbt files
+    "*.sql": "jinja-sql",
     ".sqlfluff": "ini"
   },
+
+  "dbt.sqlFmtPath": "/opt/anaconda3/envs/financial-pipeline/bin/sqlfmt",
   "sqlfluff.executablePath": "/opt/anaconda3/envs/financial-pipeline/bin/sqlfluff",
-  "sqlfluff.linter.run": "onSave",
+  "sqlfluff.workingDirectory": "/Users/user/rere/end-to-end-financial-data-stack/dbt_stocks",
   "sqlfluff.dialect": "bigquery",
-  "sqlfluff.templater": "dbt",
+  // "sqlfluff.format.enabled": true,
+  "sqlfluff.linter.run": "onSave",
+  "sqlfluff.excludeRules": ["LT02", "AL01"],
 
   // "[sql]": {
   //   "editor.defaultFormatter": "innoverio.vscode-dbt-power-user",
@@ -57,8 +56,6 @@
   "git.openRepositoryInParentFolders": "always",
   "window.commandCenter": false,
   "workbench.settings.applyToAllProfiles": ["editor.formatOnSave"],
-  "editor.formatOnPaste": true,
   "python-envs.defaultEnvManager": "ms-python.python:conda",
-  "python-envs.defaultPackageManager": "ms-python.python:conda",
-  "sqlfluff.excludeRules": ["LT02"]
+  "python-envs.defaultPackageManager": "ms-python.python:conda"
 }

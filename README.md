@@ -203,7 +203,7 @@ All indicators are implemented as **custom dbt macros** in `macros/stock_indicat
 
 ---
 
-## 📂 Repository Structure
+## 📂 Project Structure
 
 ```
 financial-data-pipeline/
@@ -239,21 +239,7 @@ dbt tests run automatically on every `dbt build`:
 - `not_null` and `unique` on all primary key columns
 - `unique_combination_of_columns` on `[symbol, quote_date]` for fact tables
 - `accepted_range` on RSI (0–100) and all price columns (`> 0`)
-- Tick-level quality classification in staging — downstream models consume `VALID` ticks only
-
----
-
-## 🗺️ Roadmap
-
-- [x] Real-time streaming pipeline (Pub/Sub → BigQuery)
-- [x] 5-year historical backfill + incremental merge
-- [x] Technical indicators via dbt macros
-- [x] Airflow orchestration (EOD + intraday DAGs)
-- [x] Power BI dashboard
-- [ ] CI/CD with GitHub Actions (`dbt build` on every PR)
-- [ ] Expand to more symbols and sectors
-- [ ] Add `dim_stock` with sector/industry metadata
-- [ ] News sentiment enrichment
+- Tick-level deduplication and null filtering in staging; quality classification (`VALID` / `INCONSISTENT` / `INVALID`) in intermediate — downstream marts consume `VALID` ticks only
 
 ---
 
@@ -277,12 +263,13 @@ dbt tests run automatically on every `dbt build`:
 
 ## 📊 Final Deliverables
 
-- Automated real-time + historical pipeline ingesting live market data 24/5
-- 10+ dbt models with **6 technical indicators** (SMA, EMA, RSI, Bollinger Bands, ATR, Annualised Volatility) computed entirely in SQL — no Python, no external libraries
-- Orchestrated DAGs with NYSE holiday awareness and data quality gates at every layer
+- End-to-end pipeline ingesting live market data during NYSE market hours — Finnhub API → GCP Pub/Sub → BigQuery → Power BI, refreshing every 5 minutes
+- 10+ dbt models across 3 layers (Staging → Intermediate → Marts) on **Google BigQuery**, with data quality gates at every layer
+- **6 technical indicators** (SMA, EMA, RSI, Bollinger Bands, ATR, Annualised Volatility) computed entirely in **BigQuery SQL** via custom dbt macros — no Python, no external libraries
+- Orchestrated with **Apache Airflow** — NYSE holiday-aware DAGs with EOD and intraday schedules
 - Power BI dashboard with drill-through pages per symbol, time period filters (5D/1M/3M/1Y/5Y), and toggleable indicator overlays — dashboard demonstrates SMA crossovers; full indicator set available in the data model
 
 ---
 
-_Author: [Regina Liu] (https://www.linkedin.com/in/regina-liu-0a16229b/)_  
+_Author: Regina Liu (https://www.linkedin.com/in/regina-liu-0a16229b/)_  
 _Contact: reginabb68@gmail.com_

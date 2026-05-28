@@ -149,11 +149,10 @@ You're done. Data flows automatically after this. ✅
 
 ### DAGs
 
-| DAG                             | Schedule                   | Pipeline                                                                                                                           |
-| ------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `eod_dag`                       | 4:30 PM ET, Mon–Fri        | `int_finnhub_intraday_cleaned` → `int_daily_summary_from_intraday` → `int_unified_stock_history` → `fct_stock_history_performance` |
-| `intraday_dag`                  | Every 5 min, 9:00–15:55 ET | int_finnhub_intraday_cleaned → fct_stock_intraday                                                                                  |
-| ↘ fct_stock_snapshot (parallel) |
+| DAG            | Schedule                   | Pipeline                                                                                                                           |
+| -------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `eod_dag`      | 4:30 PM ET, Mon–Fri        | `int_finnhub_intraday_cleaned` → `int_daily_summary_from_intraday` → `int_unified_stock_history` → `fct_stock_history_performance` |
+| `intraday_dag` | Every 5 min, 9:00–15:55 ET | `int_finnhub_intraday_cleaned` → → `fct_stock_intraday` and `fct_stock_snapshot` (run in parallel)                                 |
 
 ### 7. Power BI Dashboard
 

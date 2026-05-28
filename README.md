@@ -138,21 +138,20 @@ You're done. Data flows automatically after this. ✅
 ### 5. Marts Layer — indicators & serving
 
 - `fct_stock_history_performance` — full history enriched with all technical indicators
-- `fct_latest_indicators` — 6-row pre-computed lookup table (latest indicators per symbol) to avoid full table scans on every intraday query
-- `fct_stock_intraday` — joins live ticks with `fct_latest_indicators` for real-time Power BI
+- `fct_stock_intraday` — real-time price rendering on Power BI
 - `fct_stock_snapshot` — one row per symbol, current price + all indicators
 
 ### 6. Airflow Orchestration
 
-| DAG            | Schedule                   | What it runs                                                 |
-| -------------- | -------------------------- | ------------------------------------------------------------ |
-| `eod_dag`      | 4:30 PM ET, Mon–Fri        | staging → intermediate → fct_history → fct_latest_indicators |
-| `intraday_dag` | Every 5 min, 9:00–15:55 ET | fct_intraday → fct_snapshot                                  |
+| DAG            | Schedule                   | Pipeline                                                                                                                           |
+| -------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `eod_dag`      | 4:30 PM ET, Mon–Fri        | `int_finnhub_intraday_cleaned` → `int_daily_summary_from_intraday` → `int_unified_stock_history` → `fct_stock_history_performance` |
+| `intraday_dag` | Every 5 min, 9:00–15:55 ET | `int_finnhub_intraday_cleaned` → `fct_stock_intraday` (parallel) `fct_stock_snapshot`                                              |
 
 ### 7. Power BI Dashboard
 
 - Connected via BigQuery connector
-- `dim_date` enables slicing by week / month / quarter without DAX date logic
+- **Real-time Overview** — Tracking all the symbol with current price, daily change %
 - **Real-time view** — live price, RSI, EMA signals, intraday OHLC per symbol
 - **Historical view** — 5-year price chart, SMA crossovers, Bollinger Band channels
 
@@ -198,7 +197,6 @@ All indicators are implemented as **custom dbt macros** in `macros/stock_indicat
 | `fct_stock_indicators_unpivoted` | Transforms calculated technical metrics from a wide table format into a normalized long format (mapping columns into unified indicator and value rows) for Power BI. |
 | `fct_stock_intraday`             | Real-time intraday view designed for streaming and immediate Power BI visibility.                                                                                    |
 | `fct_stock_snapshot`             | Overview KPI Cards (Latest Price, Daily Change) on Power BI, one row per symbol                                                                                      |
-| `fct_latest_indicators`          | 6-row lookup to optimise intraday joins                                                                                                                              |
 | `dim_date`                       | Full date spine (2020–2030) for Power BI slicing                                                                                                                     |
 
 ---

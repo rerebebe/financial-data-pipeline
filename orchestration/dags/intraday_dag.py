@@ -58,4 +58,13 @@ with DAG(
         ),
     )
 
-    check_trading_day >> run_intraday
+    run_snapshot = BashOperator(
+        task_id="run_fct_stock_snapshot",
+        bash_command=(
+            f"dbt run --select fct_stock_snapshot"
+            f" --project-dir {DBT_PROJECT_DIR}"
+            f" --profiles-dir {DBT_PROFILES_DIR}"
+        ),
+    )
+
+    check_trading_day >> [run_intraday, run_snapshot]

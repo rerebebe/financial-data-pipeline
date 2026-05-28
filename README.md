@@ -192,14 +192,14 @@ All indicators are implemented as **custom dbt macros** in `macros/stock_indicat
 
 ### Marts
 
-| Model                           | Description                                          |
-| ------------------------------- | ---------------------------------------------------- |
-| `fct_stock_history_performance` | Full history with all technical indicators           |
-| `fct_stock_intraday`            | Real-time intraday view for Power BI                 |
-| `fct_stock_snapshot`            | Latest price + indicators, one row per symbol        |
-| `fct_latest_indicators`         | 6-row lookup to optimise intraday joins              |
-| `dim_date`                      | Full date spine (2020–2030) for Power BI slicing     |
-| `dim_stock`                     | Stock metadata dimension (disabled, ready to enable) |
+| Model                            | Description                                                                                                                                                          |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fct_stock_history_performance`  | Full historical timeline enriched with all calculated technical indicators (SMA, RSI, etc.).                                                                         |
+| `fct_stock_indicators_unpivoted` | Transforms calculated technical metrics from a wide table format into a normalized long format (mapping columns into unified indicator and value rows) for Power BI. |
+| `fct_stock_intraday`             | Real-time intraday view designed for streaming and immediate Power BI visibility.                                                                                    |
+| `fct_stock_snapshot`             | Overview KPI Cards (Latest Price, Daily Change) on Power BI, one row per symbol                                                                                      |
+| `fct_latest_indicators`          | 6-row lookup to optimise intraday joins                                                                                                                              |
+| `dim_date`                       | Full date spine (2020–2030) for Power BI slicing                                                                                                                     |
 
 ---
 

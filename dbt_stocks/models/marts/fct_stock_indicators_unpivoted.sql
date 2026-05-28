@@ -29,4 +29,29 @@ with
 
 select *
 from base
-where value is not null
+where
+    value is not null
+
+    {# {{ config(materialized="view") }}
+
+with unpivoted_data as (
+    select 
+        symbol,
+        quote_date,
+        indicator,
+        value
+    from {{ ref("fct_stock_history_performance") }}
+    unpivot(
+        value for indicator in (
+            close_price_validated as 'close_price',
+            sma_20 as 'SMA 20',
+            sma_50 as 'SMA 50',
+            sma_200 as 'SMA 200'
+        )
+)
+
+select * 
+from unpivoted_data
+-- BigQuery's UNPIVOT automatically excludes null values by default, 
+-- but explicitly stating it keeps it clean!
+where value is not null #}

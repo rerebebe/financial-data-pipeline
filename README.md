@@ -147,7 +147,7 @@ You're done. Data flows automatically after this. ✅
 
 `stg_stock_quotes` → `int_finnhub_intraday_cleaned`
 
-### DAGs
+#### DAGs
 
 | DAG            | Schedule                   | Pipeline                                                                                                                           |
 | -------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |

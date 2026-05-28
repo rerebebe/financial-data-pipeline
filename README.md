@@ -143,7 +143,7 @@ You're done. Data flows automatically after this. ✅
 
 ### 6. Airflow Orchestration
 
-### Shared upstream (both DAGs depend on this):
+#### Shared upstream (both DAGs depend on this):
 
 `stg_stock_quotes` → `int_finnhub_intraday_cleaned`
 

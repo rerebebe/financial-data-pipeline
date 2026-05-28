@@ -177,18 +177,18 @@ All indicators are implemented as **custom dbt macros** in `macros/stock_indicat
 
 ### Staging
 
-| Model                    | Description                                                      |
-| ------------------------ | ---------------------------------------------------------------- |
-| `stg_stock_quotes`       | Parsed + deduplicated intraday ticks with quality classification |
-| `stg_5_year_stock_price` | Type-cast 5-year OHLCV historical data                           |
+| Model                    | Description                                                       |
+| ------------------------ | ----------------------------------------------------------------- |
+| `stg_stock_quotes`       | Parses semi-structured JSON API payloads into a structured schema |
+| `stg_5_year_stock_price` | Type-cast 5-year OHLCV historical data                            |
 
 ### Intermediate
 
-| Model                             | Description                                   |
-| --------------------------------- | --------------------------------------------- |
-| `int_finnhub_intraday_cleaned`    | VALID ticks only, with data_source tag        |
-| `int_daily_summary_from_intraday` | Daily OHLC aggregated from intraday ticks     |
-| `int_unified_stock_history`       | Incrementally merged 5yr + live daily history |
+| Model                             | Description                                                                                          |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `int_finnhub_intraday_cleaned`    | Intraday stock ticks enriched with data quality status classification and original data source tags. |
+| `int_daily_summary_from_intraday` | Incremental daily summary aggregator. Uses a 3-day lookback window for fast, incremental processing. |
+| `int_unified_stock_history`       | Incrementally merged 5yr + live daily history                                                        |
 
 ### Marts
 
@@ -263,7 +263,7 @@ dbt tests run automatically on every `dbt build`:
 
 ## 📊 Final Deliverables
 
-- End-to-end pipeline ingesting live market data during NYSE market hours — Finnhub API → GCP Pub/Sub → BigQuery → Power BI, refreshing every 5 minutes
+- End-to-end pipeline ingesting live market data during NYSE market hours — Finnhub API → (producer.py) → GCP Pub/Sub → BigQuery → Power BI, refreshing every 5 minutes
 - 10+ dbt models across 3 layers (Staging → Intermediate → Marts) on **Google BigQuery**, with data quality gates at every layer
 - **6 technical indicators** (SMA, EMA, RSI, Bollinger Bands, ATR, Annualised Volatility) computed entirely in **BigQuery SQL** via custom dbt macros — no Python, no external libraries
 - Orchestrated with **Apache Airflow** — NYSE holiday-aware DAGs with EOD and intraday schedules

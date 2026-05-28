@@ -1,4 +1,7 @@
 -- fct_stock_intraday.sql
+-- it's a view just in case that the `fct_latest_indicators`'s join logic will scan
+-- the massive 'fct_stock_history_performance` every five minutes, which would be bad
+-- for performance.
 {{
     config(
         materialized="view",

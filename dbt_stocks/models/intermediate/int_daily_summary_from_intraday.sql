@@ -1,17 +1,26 @@
 -- int_daily_summary_from_intraday.sql
-{{ config(
-    materialized='table',
-    labels={'contains_pii': 'no', 'priority': 'high'}
-) }}
+{{
+    config(
+        materialized="incremental",
+        unique_key="unique_summary_id",
+        labels={"contains_pii": "no", "priority": "high"},
+    )
+}}
 
 with
     base as (
         select *
         from {{ ref("int_finnhub_intraday_cleaned") }}
-        where data_quality_status = 'VALID'
+        where
+            data_quality_status = 'VALID'
+            {% if is_incremental() %}
+                -- Only look at the last 3 days of streaming data to keep runs fast
+                and quote_date >= current_date() - 3
+            {% endif %}
+
     ),
 
-    final as (
+    aggregated as (
         select
             symbol,
             quote_date,
@@ -31,6 +40,22 @@ with
 
         from base
         group by 1, 2
+    ),
+
+    final as (
+        select
+            -- Generate the deterministic MD5 surrogate key
+            {{ dbt_utils.generate_surrogate_key(["symbol", "quote_date"]) }}
+            as unique_summary_id,
+            symbol,
+            quote_date,
+            data_source,
+            open_price,
+            day_high,
+            day_low,
+            close_price,
+            ingest_timestamp
+        from aggregated
     )
 
 select *

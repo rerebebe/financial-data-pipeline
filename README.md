@@ -84,7 +84,7 @@ cp .env.example .env
 
 ```bash
 cd orchestration
-docker-compose up -d
+docker compose up -d
 # Airflow UI → http://localhost:8080
 ```
 
@@ -203,7 +203,7 @@ All indicators are implemented as **custom dbt macros** in `macros/stock_indicat
 | `fct_stock_indicators_unpivoted` | Transforms calculated technical metrics from a wide table format into a normalized long format (mapping columns into unified indicator and value rows) for Power BI. |
 | `fct_stock_intraday`             | Real-time intraday view designed for streaming and immediate Power BI visibility.                                                                                    |
 | `fct_stock_snapshot`             | Overview KPI Cards (Latest Price, Daily Change) on Power BI, one row per symbol                                                                                      |
-| `dim_date`                       | Full date spine (2020–2030) for Power BI slicing                                                                                                                     |
+| `dim_date`                       | Full date spine (2020–2030) for Power BI slicing - reserved for future time intelligence and reporting extensions                                                    |
 
 ---
 

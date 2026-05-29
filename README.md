@@ -126,13 +126,15 @@ You're done. Data flows automatically after this. ✅
 
 ### 3. Staging Layer — parsing & quality classification
 
-- `stg_stock_quotes` — parses raw Pub/Sub JSON, deduplicates via `QUALIFY ROW_NUMBER()`, classifies each tick as `VALID`, `INCONSISTENT`, or `INVALID`
-- `stg_5_year_stock_price` — type casts and standardises the historical raw table
+- `stg_stock_quotes` — Parses raw Pub/Sub JSON and performs initial deduplication via QUALIFY ROW_NUMBER(). This layer maintains a near 1:1 relationship with the source data
+
+- `stg_5_year_stock_price` — Type casts and standardises the historical raw table
 
 ### 4. Intermediate Layer — aggregation & incremental merge
 
-- `int_finnhub_intraday_cleaned` — filters to `VALID` ticks, adds `data_source` tag
-- `int_daily_summary_from_intraday` — aggregates intraday ticks into daily OHLC (open, high, low, close)
+- `int_finnhub_intraday_cleaned` — Assigns data quality status (`VALID`, `INCONSISTENT`, or `INVALID`) based on business logic and filters the dataset to only include VALID ticks for downstream consumption
+
+- `int_daily_summary_from_intraday` — Aggregates the cleaned intraday ticks into daily OHLC (open, high, low, close)
 - `int_unified_stock_history` — incremental merge of 5-year base + daily summaries; lookback anchored to `max(quote_date) - 10 days` to handle missed runs safely
 
 ### 5. Marts Layer — indicators & serving
